@@ -18,15 +18,17 @@
 
 ;;; Usage
 
+;;
 ;; To automatically apply when saving a python file, use the
 ;; following code:
-
+;;
 ;;   (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
-
-;; To customize the behaviour of "autopep8" you can set the
-;; py-autopep8-options e.g.
-
-;;   (setq py-autopep8-options '("--max-line-length=100"))
+;;
+;; To customize the behavior of "autopep8" you can set the
+;; `py-autopep8-options' e.g.
+;;
+;;   (setq py-autopep8-options '("--max-line-length=100" "--aggressive"))
+;;
 
 ;;; Code:
 
