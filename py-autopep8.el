@@ -31,7 +31,7 @@
 ;;; Code:
 
 (defgroup py-autopep8 nil
-  "Use autopep8 to beautify a Python buffer."
+  "Use autopep8 to beautify a Python buffer manually or using a save hook."
   :group 'convenience)
 
 (defcustom py-autopep8-command "autopep8"
@@ -55,20 +55,23 @@ Note that `-' and '--exit-code' are used by default."
     (user-error (format "%s command not found." py-autopep8-command)))
 
   ;; Set the default coding for the temporary buffers.
-  (let ((sentinel-called nil)
-        (command-with-args (append (list py-autopep8-command)
-                                   py-autopep8-options
-                                   (list "-" "--exit-code")))
-        (this-buffer-coding buffer-file-coding-system)
-        (stderr-as-string nil)
+  (let
+    (
+      (sentinel-called nil)
+      (command-with-args
+        (append (list py-autopep8-command) py-autopep8-options (list "-" "--exit-code")))
+      (this-buffer-coding buffer-file-coding-system)
+      (stderr-as-string nil)
 
-        ;; Set this for `make-process' as there are no files for autopep8
-        ;; to use to detect where to read local configuration from,
-        ;; it's important the current directory is used to look this up.
-        (default-directory (file-name-directory (buffer-file-name))))
+      ;; Set this for `make-process' as there are no files for autopep8
+      ;; to use to detect where to read local configuration from,
+      ;; it's important the current directory is used to look this up.
+      (default-directory (file-name-directory (buffer-file-name))))
 
-    (let ((proc
-           (make-process
+    (let
+      (
+        (proc
+          (make-process
             :name "autopep8-proc"
             :buffer stdout-buffer
             :stderr stderr-buffer
@@ -97,26 +100,30 @@ Note that `-' and '--exit-code' are used by default."
 
       (let ((exit-code (process-exit-status proc)))
         (cond
-         ((eq exit-code 0)
-          ;; No difference.
-          nil)
-         ((or (not (eq exit-code 2)) stderr-as-string)
-          (unless stderr-as-string
-            (message "py-autopep8: error output\n%s"
-                     (with-current-buffer stderr-buffer
-                       (buffer-string))))
-          (message "py-autopep8: Command %S failed with exit code %d!"
-                   command-with-args exit-code)
-          nil)
-         (t
-          (replace-buffer-contents stdout-buffer)
-          t))))))
+          ((eq exit-code 0)
+            ;; No difference.
+            nil)
+          ((or (not (eq exit-code 2)) stderr-as-string)
+            (unless stderr-as-string
+              (message
+                "py-autopep8: error output\n%s"
+                (with-current-buffer stderr-buffer (buffer-string))))
+            (message
+              "py-autopep8: Command %S failed with exit code %d!"
+              command-with-args
+              exit-code)
+            nil)
+          (t
+            (replace-buffer-contents stdout-buffer)
+            t))))))
 
 (defun py-autopep8--buffer-format ()
   "Format the current buffer."
-  (let ((stdout-buffer nil)
-        (stderr-buffer nil)
-        (this-buffer (current-buffer)))
+  (let
+    (
+      (stdout-buffer nil)
+      (stderr-buffer nil)
+      (this-buffer (current-buffer)))
     (with-temp-buffer
       (setq stdout-buffer (current-buffer))
       (with-temp-buffer
