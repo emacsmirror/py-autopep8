@@ -1,5 +1,6 @@
 ;;; py-autopep8.el --- Use autopep8 to beautify a Python buffer -*- lexical-binding: t -*-
 
+;; SPDX-License-Identifier: GPL-3.0-or-later
 ;; Copyright (C) 2022  Campbell Barton
 ;; Copyright (C) 2013-2015, Friedrich Paetzke <f.paetzke@gmail.com>
 
