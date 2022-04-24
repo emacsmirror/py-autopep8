@@ -3,4 +3,4 @@ help:
 
 
 test:  ## Run the tests.
-	./tests.sh
+	./tests/tests.sh
