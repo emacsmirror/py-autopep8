@@ -1,12 +1,12 @@
 ;;; py-autopep8.el --- Use autopep8 to beautify a Python buffer -*- lexical-binding: t -*-
 
 ;; SPDX-License-Identifier: GPL-3.0-or-later
-;; Copyright (C) 2022  Campbell Barton
+;; Copyright (C) 2022  Campbell Barton  <ideasman42@gmail.com>
 ;; Copyright (C) 2013-2015, Friedrich Paetzke <f.paetzke@gmail.com>
 
-;; Author: Friedrich Paetzke <f.paetzke@gmail.com>
+;; Author: Friedrich Paetzk <f.paetzke@gmail.com>
 
-;; URL: http://paetzke.me/project/py-autopep8.el
+;; URL: https://github.com/ideasman42/emacs-py-autopep8
 ;; Keywords: convenience
 ;; Version: 2016.1
 ;; Package-Requires: ((emacs "26.1"))
