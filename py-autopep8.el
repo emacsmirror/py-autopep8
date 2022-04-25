@@ -52,7 +52,8 @@ Note that `-' and '--exit-code' are used by default."
 ;; Internal Functions
 
 (defun py-autopep8--buffer-format-impl (stdout-buffer stderr-buffer)
-  "Format current buffer using temporary STDOUT-BUFFER and STDERR-BUFFER."
+  "Format current buffer using temporary STDOUT-BUFFER and STDERR-BUFFER.
+Return non-nil when a the buffer was modified."
   (when (not (executable-find py-autopep8-command))
     (user-error (format "%s command not found." py-autopep8-command)))
 
@@ -120,7 +121,8 @@ Note that `-' and '--exit-code' are used by default."
             t))))))
 
 (defun py-autopep8--buffer-format ()
-  "Format the current buffer."
+  "Format the current buffer.
+Return non-nil when a the buffer was modified."
   (let
     (
       (stdout-buffer nil)
@@ -133,22 +135,27 @@ Note that `-' and '--exit-code' are used by default."
         (with-current-buffer this-buffer
           (py-autopep8--buffer-format-impl stdout-buffer stderr-buffer))))))
 
+(defun py-autopep8--buffer-format-for-save-hook ()
+  "Callback for `before-save-hook'."
+  (py-autopep8--buffer-format)
+  ;; Always return nil, continue to save.
+  nil)
+
 ;; ---------------------------------------------------------------------------
 ;; Public Functions
 
 ;;;###autoload
 (defun py-autopep8-buffer ()
-  "Use the \"autopep8\" tool to reformat the current buffer."
+  "Use the \"autopep8\" tool to reformat the current buffer.
+Return non-nil when a the buffer was modified."
   (interactive)
-  (py-autopep8--buffer-format)
-  ;; Always return nil, continue to save.
-  nil)
+  (py-autopep8--buffer-format))
 
 ;;;###autoload
 (defun py-autopep8-enable-on-save ()
   "Pre-save hook to be used before running autopep8."
   (interactive)
-  (add-hook 'before-save-hook 'py-autopep8-buffer nil t))
+  (add-hook 'before-save-hook 'py-autopep8--buffer-format-for-save-hook nil t))
 
 (provide 'py-autopep8)
 ;;; py-autopep8.el ends here
