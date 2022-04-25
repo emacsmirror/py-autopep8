@@ -55,7 +55,7 @@ Note that `-' and '--exit-code' are used by default."
   "Format current buffer using temporary STDOUT-BUFFER and STDERR-BUFFER.
 Return non-nil when a the buffer was modified."
   (when (not (executable-find py-autopep8-command))
-    (user-error (format "%s command not found." py-autopep8-command)))
+    (user-error (format "py-autopep8: %s command not found." py-autopep8-command)))
 
   ;; Set the default coding for the temporary buffers.
   (let
