@@ -8,7 +8,7 @@ Provides commands, which use the external ``autopep8`` tool to tidy up the curre
 Usage
 =====
 
-Use the package (available in MELPA) and add the ``before-save-hook`` to your init file:
+Use the package (available in MELPA) and activate ``py-autopep8-mode`` in Python mode from your init file:
 
 Manually Invoking
 -----------------
@@ -20,11 +20,11 @@ Formatting on Save
 
 You may wish to automatically format upon save.
 
-This can be done using an ``py-autopep8-enable-on-save``, e.g.
+This can be done using an ``py-autopep8-mode``, e.g.
 
 .. code-block:: elisp
 
-   (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
+   (add-hook 'python-mode-hook 'py-autopep8-mode)
 
 Now every time you save your Python file autopep8 will be executed on the current buffer.
 
@@ -60,7 +60,7 @@ An example of this package being used with ``use-package``.
    (use-package py-autopep8
      :config
      (setq py-autopep8-options '("--max-line-length=100" "--aggressive"))
-     :hook ((python-mode) . py-autopep8-enable-on-save))
+     :hook ((python-mode) . py-autopep8-mode))
 
 
 Bugs and Improvements

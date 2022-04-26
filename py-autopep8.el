@@ -22,7 +22,7 @@
 ;; To automatically apply when saving a python file, use the
 ;; following code:
 ;;
-;;   (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
+;;   (add-hook 'python-mode-hook 'py-autopep8-mode)
 ;;
 ;; To customize the behavior of "autopep8" you can set the
 ;; `py-autopep8-options' e.g.
@@ -142,6 +142,17 @@ Return non-nil when a the buffer was modified."
   nil)
 
 ;; ---------------------------------------------------------------------------
+;; Internal Mode Functions
+
+(defun py-autopep8---enable ()
+  "Enable the hooks associated with py-autopep8-mode."
+  (add-hook 'before-save-hook 'py-autopep8--buffer-format-for-save-hook nil t))
+
+(defun py-autopep8---disable ()
+  "Enable the hooks associated with py-autopep8-mode."
+  (remove-hook 'before-save-hook 'py-autopep8--buffer-format-for-save-hook t))
+
+;; ---------------------------------------------------------------------------
 ;; Public Functions
 
 ;;;###autoload
@@ -151,11 +162,26 @@ Return non-nil when a the buffer was modified."
   (interactive)
   (py-autopep8--buffer-format))
 
+;; Deprecated (in favor of the minor mode, which can be disabled).
 ;;;###autoload
 (defun py-autopep8-enable-on-save ()
   "Pre-save hook to be used before running autopep8."
   (interactive)
-  (add-hook 'before-save-hook 'py-autopep8--buffer-format-for-save-hook nil t))
+  (message "py-autopep8-enable-on-save is deprecated! use [py-autopep8-mode] instead!")
+  (py-autopep8---enable))
+
+;;;###autoload
+(define-minor-mode py-autopep8-mode
+  "Py-autopep8 minor mode."
+  :global nil
+  :lighter ""
+  :keymap nil
+
+  (cond
+    (py-autopep8-mode
+      (py-autopep8---enable))
+    (t
+      (py-autopep8---disable))))
 
 (provide 'py-autopep8)
 ;;; py-autopep8.el ends here
