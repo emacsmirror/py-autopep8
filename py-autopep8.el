@@ -38,14 +38,12 @@
 
 (defcustom py-autopep8-command "autopep8"
   "The location of the autopep8 command (otherwise find in PATH)."
-  :group 'py-autopep8
   :type 'string)
 
 (defcustom py-autopep8-options nil
   "Options used for autopep8.
 
 Note that `-' and '--exit-code' are used by default."
-  :group 'py-autopep8
   :type '(repeat (string :tag "option")))
 
 ;; ---------------------------------------------------------------------------
