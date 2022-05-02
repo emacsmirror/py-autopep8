@@ -71,12 +71,49 @@ Otherwise you can set this to a user defined function."
         (when dir
           (concat dir filename))))))
 
+(defun py-autopep8--region-contract-to-whole-lines (beg end)
+  "Clamp BEG & END to whole lines."
+  (let
+    (
+      (beg-bol (line-beginning-position beg))
+      (end-eol (line-end-position end)))
+
+    ;; If the leading/trailing parts of the beginning/end lines is white-space
+    ;; then extend the selection to the bounds, otherwise contract the range
+    ;; so a partially selected line is excluded from the range
+    ;; as `autopep8' operates on line-ranges.
+    (when (< beg-bol beg)
+      (save-excursion
+        (goto-char beg)
+        (skip-chars-backward "[:blank:]" beg-bol)
+        (setq beg (point))
+        (when (< beg-bol beg)
+          ;; Partial line selected, step to the next line.
+          (forward-line 1)
+          (setq beg (line-beginning-position)))))
+    (when (> end-eol end)
+      (save-excursion
+        (goto-char end)
+        (skip-chars-forward "[:blank:]" end-eol)
+        (setq end (point))
+        (when (> end-eol end)
+          ;; Partial line selected, step to the previous line.
+          (forward-line -1)
+          (setq end (line-end-position))))))
+
+  (cond
+    ((< beg end)
+      (cons beg end))
+    (t
+      nil)))
+
 
 ;; ---------------------------------------------------------------------------
 ;; Internal Functions
 
-(defun py-autopep8--buffer-format-impl (stdout-buffer stderr-buffer)
+(defun py-autopep8--buffer-format-impl (range stdout-buffer stderr-buffer)
   "Format current buffer using temporary STDOUT-BUFFER and STDERR-BUFFER.
+When RANGE is non-nil it's used as the range to format.
 Return non-nil when a the buffer was modified."
   (when (not (executable-find py-autopep8-command))
     (user-error "py-autopep8: %s command not found" py-autopep8-command))
@@ -94,6 +131,23 @@ Return non-nil when a the buffer was modified."
       ;; to use to detect where to read local configuration from,
       ;; it's important the current directory is used to look this up.
       (default-directory (file-name-directory (buffer-file-name))))
+
+    ;; Support for formatting a limited range.
+    (when range
+      (setq range (py-autopep8--region-contract-to-whole-lines (car range) (cdr range)))
+      (unless range
+        (user-error "The range did not include whole lines!"))
+
+      ;; Contract the region around partially selected lines.
+      ;; NOTE: no need for special handling of narrowing in save hooks.
+      (let*
+        (
+          (line-beg (count-lines (point-min) (car range)))
+          (line-end (+ (1- line-beg) (count-lines (car range) (cdr range)))))
+        (nconc
+          command-with-args
+          (list
+            "--line-range" (number-to-string (1+ line-beg)) (number-to-string (1+ line-end))))))
 
     (let
       (
@@ -144,8 +198,9 @@ Return non-nil when a the buffer was modified."
             (replace-buffer-contents stdout-buffer)
             t))))))
 
-(defun py-autopep8--buffer-format ()
+(defun py-autopep8--buffer-format (range)
   "Format the current buffer.
+When RANGE is non-nil it's used as the range to format.
 Return non-nil when a the buffer was modified."
   (let
     (
@@ -157,13 +212,13 @@ Return non-nil when a the buffer was modified."
       (with-temp-buffer
         (setq stderr-buffer (current-buffer))
         (with-current-buffer this-buffer
-          (py-autopep8--buffer-format-impl stdout-buffer stderr-buffer))))))
+          (py-autopep8--buffer-format-impl range stdout-buffer stderr-buffer))))))
 
 (defun py-autopep8--buffer-format-for-save-hook ()
   "Callback for `before-save-hook'."
   ;; Demote errors as this is user configurable, we can't be sure it wont error.
   (when (with-demoted-errors "py-autopep8: Error %S" (funcall py-autopep8-on-save-p))
-    (py-autopep8--buffer-format))
+    (py-autopep8--buffer-format nil))
   ;; Always return nil, continue to save.
   nil)
 
@@ -211,7 +266,14 @@ Return non-nil when a the buffer was modified."
   "Use the \"autopep8\" tool to reformat the current buffer.
 Return non-nil when a the buffer was modified."
   (interactive)
-  (py-autopep8--buffer-format))
+  (py-autopep8--buffer-format nil))
+
+;;;###autoload
+(defun py-autopep8-region (beg end)
+  "Use the \"autopep8\" tool to reformat whole lines in the region (BEG, END).
+Return non-nil when a the buffer was modified."
+  (interactive "r")
+  (py-autopep8--buffer-format (cons beg end)))
 
 ;; Deprecated (in favor of the minor mode, which can be disabled).
 ;;;###autoload

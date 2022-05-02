@@ -14,7 +14,8 @@ Use the package (available in MELPA) and activate ``py-autopep8-mode`` in Python
 Manually Invoking
 -----------------
 
-To execute this manually on the buffer, run ``M-x py-autopep8-buffer``
+To execute this manually on the buffer,
+run: ``M-x py-autopep8-buffer`` or ``M-x py-autopep8-region`` to format the region.
 
 
 Formatting on Save
