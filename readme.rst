@@ -8,7 +8,8 @@ Provides commands, which use the external ``autopep8`` tool to tidy up the curre
 Usage
 =====
 
-Use the package (available in MELPA) and activate ``py-autopep8-mode`` in Python mode from your init file:
+Use the package `(available in MELPA) <https://melpa.org/#/py-autopep8>`__
+and activate ``py-autopep8-mode`` in Python mode from your init file:
 
 
 Manually Invoking
