@@ -45,6 +45,24 @@ To customize the behavior of ``autopep8`` you can set the command and options it
    Can be used to point to the location of the ``autopep8`` command
    (otherwise ``autopep8`` from the ``PATH`` will be used).
 
+``py-autopep8-on-save-p`` (defaults to ``'always``)
+   This function is called before formatting on save, if it returns non-nil,
+   auto-formatting will be performed.
+
+   Since you may want to only reformat on saving for projects that use autopep8,
+   preset functions have been included:
+
+   - ``'always`` always reformat on save.
+
+   - ``'py-autopep8-check-pyproject-exists``
+     only reformat when ``pyproject.toml`` exists in the current directory or any of it's parents.
+
+   - ``'py-autopep8-check-pyproject-exists-with-autopep8``
+     only reformat when ``pyproject.toml`` exists in the current directory or any of it's parents and
+     contains a ``[tool.autopep8]`` entry.
+
+   Otherwise you can set this to a user defined function.
+
 
 Installation
 ============

@@ -46,6 +46,32 @@
 Note that `-' and '--exit-code' are used by default."
   :type '(repeat (string :tag "option")))
 
+(defcustom py-autopep8-on-save-p 'always
+  "Only reformat on save if this function returns non-nil.
+
+You may wish to choose one of the following options:
+- `always': To always format on save.
+- `py-autopep8-check-pyproject-exists':
+  Only reformat when \"pyproject.toml\" exists.
+- `py-autopep8-check-pyproject-exists-with-autopep8':
+  Only reformat when \"pyproject.toml\" exists and
+  contains a [tool.autopep8] entry.
+
+Otherwise you can set this to a user defined function."
+  :type 'function)
+
+;; ---------------------------------------------------------------------------
+;; Generic Utility Functions
+
+(defun py-autopep8--locate-dominating-file-from-buffer (filename)
+  "Return the path to the current buffers FILENAME file or nil."
+  (let ((filepath buffer-file-name))
+    (when filepath
+      (let ((dir (locate-dominating-file (file-name-directory filepath) filename)))
+        (when dir
+          (concat dir filename))))))
+
+
 ;; ---------------------------------------------------------------------------
 ;; Internal Functions
 
@@ -135,7 +161,9 @@ Return non-nil when a the buffer was modified."
 
 (defun py-autopep8--buffer-format-for-save-hook ()
   "Callback for `before-save-hook'."
-  (py-autopep8--buffer-format)
+  ;; Demote errors as this is user configurable, we can't be sure it wont error.
+  (when (with-demoted-errors "py-autopep8: Error %S" (funcall py-autopep8-on-save-p))
+    (py-autopep8--buffer-format))
   ;; Always return nil, continue to save.
   nil)
 
@@ -149,6 +177,31 @@ Return non-nil when a the buffer was modified."
 (defun py-autopep8---disable ()
   "Enable the hooks associated with `py-autopep8-mode'."
   (remove-hook 'before-save-hook #'py-autopep8--buffer-format-for-save-hook t))
+
+
+;; ---------------------------------------------------------------------------
+;; Public Auto-Format Predicate Functions
+
+(defun py-autopep8-check-pyproject-exists ()
+  "Return t when a pyproject.toml file is found."
+  (let ((project-file (py-autopep8--locate-dominating-file-from-buffer "pyproject.toml")))
+    (not (null project-file))))
+
+(defun py-autopep8-check-pyproject-exists-with-autopep8 ()
+  "Return t when a pyproject.toml file is found with a tool.autopep8 entry."
+  (let ((project-file (py-autopep8--locate-dominating-file-from-buffer "pyproject.toml")))
+    (when project-file
+      (with-temp-buffer
+        (insert-file-contents project-file)
+        (goto-char (point-min))
+
+        (save-match-data
+          (let ((case-fold-search nil))
+            ;; Final result is true when this search succeeds.
+            ;; NOTE: this isn't bullet-proof as it's possible to have this in the
+            ;; middle of a multi-line string. In practice this seems unlikely though.
+            (re-search-forward "^[[:blank:]]*\\[tool\\.autopep8\\]")))))))
+
 
 ;; ---------------------------------------------------------------------------
 ;; Public Functions
