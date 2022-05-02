@@ -10,10 +10,12 @@ Usage
 
 Use the package (available in MELPA) and activate ``py-autopep8-mode`` in Python mode from your init file:
 
+
 Manually Invoking
 -----------------
 
 To execute this manually on the buffer, run ``M-x py-autopep8-buffer``
+
 
 Formatting on Save
 ------------------

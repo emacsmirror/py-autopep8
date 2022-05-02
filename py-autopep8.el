@@ -55,7 +55,7 @@ Note that `-' and '--exit-code' are used by default."
   "Format current buffer using temporary STDOUT-BUFFER and STDERR-BUFFER.
 Return non-nil when a the buffer was modified."
   (when (not (executable-find py-autopep8-command))
-    (user-error (format "py-autopep8: %s command not found." py-autopep8-command)))
+    (user-error "py-autopep8: %s command not found" py-autopep8-command))
 
   ;; Set the default coding for the temporary buffers.
   (let
@@ -145,12 +145,12 @@ Return non-nil when a the buffer was modified."
 ;; Internal Mode Functions
 
 (defun py-autopep8---enable ()
-  "Enable the hooks associated with py-autopep8-mode."
-  (add-hook 'before-save-hook 'py-autopep8--buffer-format-for-save-hook nil t))
+  "Enable the hooks associated with `py-autopep8-mode'."
+  (add-hook 'before-save-hook #'py-autopep8--buffer-format-for-save-hook nil t))
 
 (defun py-autopep8---disable ()
-  "Enable the hooks associated with py-autopep8-mode."
-  (remove-hook 'before-save-hook 'py-autopep8--buffer-format-for-save-hook t))
+  "Enable the hooks associated with `py-autopep8-mode'."
+  (remove-hook 'before-save-hook #'py-autopep8--buffer-format-for-save-hook t))
 
 ;; ---------------------------------------------------------------------------
 ;; Public Functions
