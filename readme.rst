@@ -9,28 +9,32 @@ Usage
 =====
 
 Use the package `(available in MELPA) <https://melpa.org/#/py-autopep8>`__
-and activate ``py-autopep8-mode`` in Python mode from your init file:
-
-
-Manually Invoking
------------------
-
-To execute this manually on the buffer,
-run: ``M-x py-autopep8-buffer`` or ``M-x py-autopep8-region`` to format the region.
-
-
-Formatting on Save
-------------------
-
-You may wish to automatically format upon save.
-
-This can be done using an ``py-autopep8-mode``, e.g.
+and activate ``py-autopep8-mode`` in Python mode from your init file, e.g.
 
 .. code-block:: elisp
 
-   (add-hook 'python-mode-hook 'py-autopep8-mode)
+   (use-package py-autopep8
+     :hook ((python-mode) . py-autopep8-mode))
+
 
 Now every time you save your Python file autopep8 will be executed on the current buffer.
+
+
+.. note::
+
+   - If you don't want to enable this automatically on save, you can run ``M-x py-autopep8-buffer`` manually.
+   - To *conditionally* format on save, see ``py-autopep8-on-save-p``.
+
+
+Commands
+--------
+
+``py-autopep8-mode``
+   Enable auto-formatting when saving.
+``py-autopep8-buffer``
+   Format the entire buffer.
+``py-autopep8-region``
+   Format the selected region (clamped to line bounds).
 
 
 Customization
@@ -41,7 +45,8 @@ To customize the behavior of ``autopep8`` you can set the command and options it
 ``py-autopep8-options``: (list of strings, defaults to ``()``)
    Use these options to set the default options.
 
-   Note ``autopep8`` will use ``pyproject.toml`` when found, so project wide defaults can be configured here.
+   Note ``autopep8`` will use ``pyproject.toml`` when found,
+   so it's typically best to configure project wide options there.
 
 ``py-autopep8-command`` (string defaults to ``"autopep8"``)
    Can be used to point to the location of the ``autopep8`` command
