@@ -30,7 +30,7 @@ Commands
 --------
 
 ``py-autopep8-mode``
-   Enable auto-formatting when saving.
+   Enable auto-formatting when saving (a minor mode that can be toggled).
 ``py-autopep8-buffer``
    Format the entire buffer.
 ``py-autopep8-region``
