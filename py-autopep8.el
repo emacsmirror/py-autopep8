@@ -255,7 +255,7 @@ Return non-nil when a the buffer was modified."
             ;; Final result is true when this search succeeds.
             ;; NOTE: this isn't bullet-proof as it's possible to have this in the
             ;; middle of a multi-line string. In practice this seems unlikely though.
-            (re-search-forward "^[[:blank:]]*\\[tool\\.autopep8\\]")))))))
+            (re-search-forward "^[[:blank:]]*\\[tool\\.autopep8\\]" nil t)))))))
 
 
 ;; ---------------------------------------------------------------------------
