@@ -230,7 +230,7 @@ Return non-nil when a the buffer was modified."
   (add-hook 'before-save-hook #'py-autopep8--buffer-format-for-save-hook nil t))
 
 (defun py-autopep8---disable ()
-  "Enable the hooks associated with `py-autopep8-mode'."
+  "Disable the hooks associated with `py-autopep8-mode'."
   (remove-hook 'before-save-hook #'py-autopep8--buffer-format-for-save-hook t))
 
 
