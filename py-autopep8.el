@@ -107,6 +107,28 @@ Otherwise you can set this to a user defined function."
     (t
       nil)))
 
+(defun py-autopep8--replace-buffer-contents-with-fastpath (buf)
+  "Replace buffer contents with BUF, fast-path when undo is disabled.
+
+Useful for fast operation, especially for automated conversion or tests."
+  (let
+    (
+      (is-beg (eq (point) (point-min)))
+      (is-end (eq (point) (point-max))))
+    (cond
+      ((and (eq t buffer-undo-list) (or is-beg is-end))
+        ;; No undo, use a simple method instead of `replace-buffer-contents',
+        ;; which has no benefit unless undo is in use.
+        (erase-buffer)
+        (insert-buffer-substring buf)
+        (cond
+          (is-beg
+            (goto-char (point-min)))
+          (is-end
+            (goto-char (point-max)))))
+      (t
+        (replace-buffer-contents buf)))))
+
 
 ;; ---------------------------------------------------------------------------
 ;; Internal Functions
@@ -195,7 +217,7 @@ Return non-nil when a the buffer was modified."
               exit-code)
             nil)
           (t
-            (replace-buffer-contents stdout-buffer)
+            (py-autopep8--replace-buffer-contents-with-fastpath stdout-buffer)
             t))))))
 
 (defun py-autopep8--buffer-format (range)
