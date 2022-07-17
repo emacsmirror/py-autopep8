@@ -148,6 +148,7 @@ Return non-nil when a the buffer was modified."
         (append (list py-autopep8-command) py-autopep8-options (list "-" "--exit-code")))
       (this-buffer-coding buffer-file-coding-system)
       (stderr-as-string nil)
+      (pipe-err-as-string nil)
 
       ;; Set this for `make-process' as there are no files for autopep8
       ;; to use to detect where to read local configuration from,
@@ -195,8 +196,15 @@ Return non-nil when a the buffer was modified."
                   (setq stderr-as-string (buffer-string))
                   (erase-buffer)))))))
 
-      (process-send-region proc (point-min) (point-max))
-      (process-send-eof proc)
+      (condition-case err
+        (progn
+          (process-send-region proc (point-min) (point-max))
+          (process-send-eof proc))
+        (file-error
+          ;; Formatting exited with an error, closing the `stdin' during execution.
+          ;; Even though the `stderr' will almost always be set,
+          ;; store the error as it may show additional context.
+          (setq pipe-err-as-string (error-message-string err))))
 
       (while (not sentinel-called)
         (accept-process-output))
@@ -206,7 +214,9 @@ Return non-nil when a the buffer was modified."
           ((eq exit-code 0)
             ;; No difference.
             nil)
-          ((or (not (eq exit-code 2)) stderr-as-string)
+          ((or (not (eq exit-code 2)) stderr-as-string pipe-err-as-string)
+            (when pipe-err-as-string
+              (message "py-autopep8: pipe closed with error (%s)" pipe-err-as-string))
             (when stderr-as-string
               (message "py-autopep8: error output\n%s" stderr-as-string))
             (message
