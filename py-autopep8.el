@@ -207,10 +207,8 @@ Return non-nil when a the buffer was modified."
             ;; No difference.
             nil)
           ((or (not (eq exit-code 2)) stderr-as-string)
-            (unless stderr-as-string
-              (message
-                "py-autopep8: error output\n%s"
-                (with-current-buffer stderr-buffer (buffer-string))))
+            (when stderr-as-string
+              (message "py-autopep8: error output\n%s" stderr-as-string))
             (message
               "py-autopep8: Command %S failed with exit code %d!"
               command-with-args
