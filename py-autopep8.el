@@ -255,11 +255,11 @@ Return non-nil when a the buffer was modified."
 ;; ---------------------------------------------------------------------------
 ;; Internal Mode Functions
 
-(defun py-autopep8---enable ()
+(defun py-autopep8--enable ()
   "Enable the hooks associated with `py-autopep8-mode'."
   (add-hook 'before-save-hook #'py-autopep8--buffer-format-for-save-hook nil t))
 
-(defun py-autopep8---disable ()
+(defun py-autopep8--disable ()
   "Disable the hooks associated with `py-autopep8-mode'."
   (remove-hook 'before-save-hook #'py-autopep8--buffer-format-for-save-hook t))
 
@@ -311,7 +311,7 @@ Return non-nil when a the buffer was modified."
   "Pre-save hook to be used before running autopep8."
   (interactive)
   (message "py-autopep8-enable-on-save is deprecated! use [py-autopep8-mode] instead!")
-  (py-autopep8---enable))
+  (py-autopep8--enable))
 
 ;;;###autoload
 (define-minor-mode py-autopep8-mode
@@ -322,9 +322,9 @@ Return non-nil when a the buffer was modified."
 
   (cond
     (py-autopep8-mode
-      (py-autopep8---enable))
+      (py-autopep8--enable))
     (t
-      (py-autopep8---disable))))
+      (py-autopep8--disable))))
 
 (provide 'py-autopep8)
 ;;; py-autopep8.el ends here
