@@ -211,7 +211,7 @@ Return non-nil when a the buffer was modified."
 
       (let ((exit-code (process-exit-status proc)))
         (cond
-          ((eq exit-code 0)
+          ((zerop exit-code)
             ;; No difference.
             nil)
           ((or (not (eq exit-code 2)) stderr-as-string pipe-err-as-string)
