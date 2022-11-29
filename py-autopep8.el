@@ -305,14 +305,6 @@ Return non-nil when a the buffer was modified."
   (interactive "r")
   (py-autopep8--buffer-format (cons beg end)))
 
-;; Deprecated (in favor of the minor mode, which can be disabled).
-;;;###autoload
-(defun py-autopep8-enable-on-save ()
-  "Pre-save hook to be used before running autopep8."
-  (interactive)
-  (message "py-autopep8-enable-on-save is deprecated! use [py-autopep8-mode] instead!")
-  (py-autopep8--enable))
-
 ;;;###autoload
 (define-minor-mode py-autopep8-mode
   "Py-autopep8 minor mode."
