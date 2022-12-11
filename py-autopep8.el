@@ -219,8 +219,7 @@ Return non-nil when a the buffer was modified."
               (message "py-autopep8: pipe closed with error (%s)" pipe-err-as-string))
             (when stderr-as-string
               (message "py-autopep8: error output\n%s" stderr-as-string))
-            (message
-              "py-autopep8: Command %S failed with exit code %d!"
+            (message "py-autopep8: Command %S failed with exit code %d!"
               command-with-args
               exit-code)
             nil)
