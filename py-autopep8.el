@@ -6,7 +6,7 @@
 
 ;; Author: Friedrich Paetzk <f.paetzke@gmail.com>
 
-;; URL: https://github.com/ideasman42/emacs-py-autopep8
+;; URL: https://codeberg.org/ideasman42/emacs-py-autopep8
 ;; Keywords: convenience
 ;; Version: 2016.1
 ;; Package-Requires: ((emacs "26.1"))
