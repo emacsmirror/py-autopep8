@@ -6,4 +6,5 @@
   (setq python-indent-guess-indent-offset t)
   (setq python-indent-guess-indent-offset-verbose nil))
 
-(defun py-autopep8-write-test-file () (write-file "/tmp/py-test-file.py"))
+(defun py-autopep8-write-test-file ()
+  (write-file "/tmp/py-test-file.py"))

@@ -73,10 +73,8 @@ Otherwise you can set this to a user defined function."
 
 (defun py-autopep8--region-contract-to-whole-lines (beg end)
   "Clamp BEG & END to whole lines."
-  (let
-    (
-      (beg-bol (line-beginning-position beg))
-      (end-eol (line-end-position end)))
+  (let ((beg-bol (line-beginning-position beg))
+        (end-eol (line-end-position end)))
 
     ;; If the leading/trailing parts of the beginning/end lines is white-space
     ;; then extend the selection to the bounds, otherwise contract the range
@@ -102,32 +100,30 @@ Otherwise you can set this to a user defined function."
           (setq end (line-end-position))))))
 
   (cond
-    ((< beg end)
-      (cons beg end))
-    (t
-      nil)))
+   ((< beg end)
+    (cons beg end))
+   (t
+    nil)))
 
 (defun py-autopep8--replace-buffer-contents-with-fastpath (buf)
   "Replace buffer contents with BUF, fast-path when undo is disabled.
 
 Useful for fast operation, especially for automated conversion or tests."
-  (let
-    (
-      (is-beg (bobp))
-      (is-end (eobp)))
+  (let ((is-beg (bobp))
+        (is-end (eobp)))
     (cond
-      ((and (eq t buffer-undo-list) (or is-beg is-end))
-        ;; No undo, use a simple method instead of `replace-buffer-contents',
-        ;; which has no benefit unless undo is in use.
-        (erase-buffer)
-        (insert-buffer-substring buf)
-        (cond
-          (is-beg
-            (goto-char (point-min)))
-          (is-end
-            (goto-char (point-max)))))
-      (t
-        (replace-buffer-contents buf)))))
+     ((and (eq t buffer-undo-list) (or is-beg is-end))
+      ;; No undo, use a simple method instead of `replace-buffer-contents',
+      ;; which has no benefit unless undo is in use.
+      (erase-buffer)
+      (insert-buffer-substring buf)
+      (cond
+       (is-beg
+        (goto-char (point-min)))
+       (is-end
+        (goto-char (point-max)))))
+     (t
+      (replace-buffer-contents buf)))))
 
 
 ;; ---------------------------------------------------------------------------
@@ -141,19 +137,17 @@ Return non-nil when a the buffer was modified."
     (user-error "py-autopep8: %s command not found" py-autopep8-command))
 
   ;; Set the default coding for the temporary buffers.
-  (let
-    (
-      (sentinel-called nil)
-      (command-with-args
-        (append (list py-autopep8-command) py-autopep8-options (list "-" "--exit-code")))
-      (this-buffer-coding buffer-file-coding-system)
-      (stderr-as-string nil)
-      (pipe-err-as-string nil)
+  (let ((sentinel-called nil)
+        (command-with-args
+         (append (list py-autopep8-command) py-autopep8-options (list "-" "--exit-code")))
+        (this-buffer-coding buffer-file-coding-system)
+        (stderr-as-string nil)
+        (pipe-err-as-string nil)
 
-      ;; Set this for `make-process' as there are no files for autopep8
-      ;; to use to detect where to read local configuration from,
-      ;; it's important the current directory is used to look this up.
-      (default-directory (file-name-directory (buffer-file-name))))
+        ;; Set this for `make-process' as there are no files for autopep8
+        ;; to use to detect where to read local configuration from,
+        ;; it's important the current directory is used to look this up.
+        (default-directory (file-name-directory (buffer-file-name))))
 
     ;; Support for formatting a limited range.
     (when range
@@ -163,19 +157,17 @@ Return non-nil when a the buffer was modified."
 
       ;; Contract the region around partially selected lines.
       ;; NOTE: no need for special handling of narrowing in save hooks.
-      (let*
-        (
-          (line-beg (count-lines (point-min) (car range)))
-          (line-end (+ (1- line-beg) (count-lines (car range) (cdr range)))))
+      (let* ((line-beg (count-lines (point-min) (car range)))
+             (line-end (+ (1- line-beg) (count-lines (car range) (cdr range)))))
         (nconc
-          command-with-args
-          (list
-            "--line-range" (number-to-string (1+ line-beg)) (number-to-string (1+ line-end))))))
+         command-with-args
+         (list
+          "--line-range"
+          (number-to-string (1+ line-beg))
+          (number-to-string (1+ line-end))))))
 
-    (let
-      (
-        (proc
-          (make-process
+    (let ((proc
+           (make-process
             :name "autopep8-proc"
             :buffer stdout-buffer
             :stderr stderr-buffer
@@ -197,45 +189,41 @@ Return non-nil when a the buffer was modified."
                   (erase-buffer)))))))
 
       (condition-case err
-        (progn
-          (process-send-region proc (point-min) (point-max))
-          (process-send-eof proc))
+          (progn
+            (process-send-region proc (point-min) (point-max))
+            (process-send-eof proc))
         (file-error
-          ;; Formatting exited with an error, closing the `stdin' during execution.
-          ;; Even though the `stderr' will almost always be set,
-          ;; store the error as it may show additional context.
-          (setq pipe-err-as-string (error-message-string err))))
+         ;; Formatting exited with an error, closing the `stdin' during execution.
+         ;; Even though the `stderr' will almost always be set,
+         ;; store the error as it may show additional context.
+         (setq pipe-err-as-string (error-message-string err))))
 
       (while (not sentinel-called)
         (accept-process-output))
 
       (let ((exit-code (process-exit-status proc)))
         (cond
-          ((zerop exit-code)
-            ;; No difference.
-            nil)
-          ((or (not (eq exit-code 2)) stderr-as-string pipe-err-as-string)
-            (when pipe-err-as-string
-              (message "py-autopep8: pipe closed with error (%s)" pipe-err-as-string))
-            (when stderr-as-string
-              (message "py-autopep8: error output\n%s" stderr-as-string))
-            (message "py-autopep8: Command %S failed with exit code %d!"
-              command-with-args
-              exit-code)
-            nil)
-          (t
-            (py-autopep8--replace-buffer-contents-with-fastpath stdout-buffer)
-            t))))))
+         ((zerop exit-code)
+          ;; No difference.
+          nil)
+         ((or (not (eq exit-code 2)) stderr-as-string pipe-err-as-string)
+          (when pipe-err-as-string
+            (message "py-autopep8: pipe closed with error (%s)" pipe-err-as-string))
+          (when stderr-as-string
+            (message "py-autopep8: error output\n%s" stderr-as-string))
+          (message "py-autopep8: Command %S failed with exit code %d!" command-with-args exit-code)
+          nil)
+         (t
+          (py-autopep8--replace-buffer-contents-with-fastpath stdout-buffer)
+          t))))))
 
 (defun py-autopep8--buffer-format (range)
   "Format the current buffer.
 When RANGE is non-nil it's used as the range to format.
 Return non-nil when a the buffer was modified."
-  (let
-    (
-      (stdout-buffer nil)
-      (stderr-buffer nil)
-      (this-buffer (current-buffer)))
+  (let ((stdout-buffer nil)
+        (stderr-buffer nil)
+        (this-buffer (current-buffer)))
     (with-temp-buffer
       (setq stdout-buffer (current-buffer))
       (with-temp-buffer
@@ -246,7 +234,8 @@ Return non-nil when a the buffer was modified."
 (defun py-autopep8--buffer-format-for-save-hook ()
   "Callback for `before-save-hook'."
   ;; Demote errors as this is user configurable, we can't be sure it wont error.
-  (when (with-demoted-errors "py-autopep8: Error %S" (funcall py-autopep8-on-save-p))
+  (when (with-demoted-errors "py-autopep8: Error %S"
+          (funcall py-autopep8-on-save-p))
     (py-autopep8--buffer-format nil))
   ;; Always return nil, continue to save.
   nil)
@@ -312,10 +301,10 @@ Return non-nil when a the buffer was modified."
   :keymap nil
 
   (cond
-    (py-autopep8-mode
-      (py-autopep8--enable))
-    (t
-      (py-autopep8--disable))))
+   (py-autopep8-mode
+    (py-autopep8--enable))
+   (t
+    (py-autopep8--disable))))
 
 (provide 'py-autopep8)
 ;;; py-autopep8.el ends here
