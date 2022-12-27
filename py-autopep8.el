@@ -113,8 +113,8 @@ Otherwise you can set this to a user defined function."
 Useful for fast operation, especially for automated conversion or tests."
   (let
     (
-      (is-beg (eq (point) (point-min)))
-      (is-end (eq (point) (point-max))))
+      (is-beg (bobp))
+      (is-end (eobp)))
     (cond
       ((and (eq t buffer-undo-list) (or is-beg is-end))
         ;; No undo, use a simple method instead of `replace-buffer-contents',
