@@ -161,10 +161,7 @@ Return non-nil when a the buffer was modified."
              (line-end (+ (1- line-beg) (count-lines (car range) (cdr range)))))
         (nconc
          command-with-args
-         (list
-          "--line-range"
-          (number-to-string (1+ line-beg))
-          (number-to-string (1+ line-end))))))
+         (list "--line-range" (number-to-string (1+ line-beg)) (number-to-string (1+ line-end))))))
 
     (let ((proc
            (make-process
@@ -234,8 +231,9 @@ Return non-nil when a the buffer was modified."
 (defun py-autopep8--buffer-format-for-save-hook ()
   "Callback for `before-save-hook'."
   ;; Demote errors as this is user configurable, we can't be sure it wont error.
-  (when (with-demoted-errors "py-autopep8: Error %S"
-          (funcall py-autopep8-on-save-p))
+  (when (or (eq py-autopep8-on-save-p 'always) ;; Keep explicit check until Emacs 26.3 is dropped.
+            (with-demoted-errors "py-autopep8: Error %S"
+              (funcall py-autopep8-on-save-p)))
     (py-autopep8--buffer-format nil))
   ;; Always return nil, continue to save.
   nil)
