@@ -309,4 +309,8 @@ Return non-nil when a the buffer was modified."
     (py-autopep8--disable))))
 
 (provide 'py-autopep8)
+;; Local Variables:
+;; fill-column: 99
+;; indent-tabs-mode: nil
+;; End:
 ;;; py-autopep8.el ends here
