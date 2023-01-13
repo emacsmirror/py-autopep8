@@ -73,8 +73,8 @@ Otherwise you can set this to a user defined function."
 
 (defun py-autopep8--region-contract-to-whole-lines (beg end)
   "Clamp BEG & END to whole lines."
-  (let ((beg-bol (line-beginning-position beg))
-        (end-eol (line-end-position end)))
+  (let ((beg-bol (pos-bol beg))
+        (end-eol (pos-eol end)))
 
     ;; If the leading/trailing parts of the beginning/end lines is white-space
     ;; then extend the selection to the bounds, otherwise contract the range
@@ -88,7 +88,7 @@ Otherwise you can set this to a user defined function."
         (when (< beg-bol beg)
           ;; Partial line selected, step to the next line.
           (forward-line 1)
-          (setq beg (line-beginning-position)))))
+          (setq beg (pos-bol)))))
     (when (> end-eol end)
       (save-excursion
         (goto-char end)
@@ -97,7 +97,7 @@ Otherwise you can set this to a user defined function."
         (when (> end-eol end)
           ;; Partial line selected, step to the previous line.
           (forward-line -1)
-          (setq end (line-end-position))))))
+          (setq end (pos-eol))))))
 
   (cond
    ((< beg end)
