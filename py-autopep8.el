@@ -156,11 +156,11 @@ Return non-nil when a the buffer was modified."
     (user-error "py-autopep8: %s command not found" py-autopep8-command))
 
   ;; Set the default coding for the temporary buffers.
-  (let ((sentinel-called nil)
+  (let ((sentinel-called 0)
+        (sentinel-called-expect 1)
         (command-with-args
          (append (list py-autopep8-command) py-autopep8-options (list "-" "--exit-code")))
         (this-buffer-coding buffer-file-coding-system)
-        (stderr-as-string nil)
         (pipe-err-as-string nil)
 
         ;; Set this for `make-process' as there are no files for autopep8
@@ -182,7 +182,7 @@ Return non-nil when a the buffer was modified."
          command-with-args
          (list "--line-range" (number-to-string (1+ line-beg)) (number-to-string (1+ line-end))))))
 
-    (let ((proc
+    (let ((proc-out
            (make-process
             :name "autopep8-proc"
             :buffer stdout-buffer
@@ -191,42 +191,41 @@ Return non-nil when a the buffer was modified."
             :connection-type 'pipe
             :command command-with-args
             :sentinel
-            (lambda (_proc _msg)
-              (setq sentinel-called t)
+            (lambda (_proc _msg) (setq sentinel-called (1+ sentinel-called)))))
+          (proc-err (get-buffer-process stderr-buffer)))
 
-              ;; Assign in the sentinel to prevent "Process .. finished"
-              ;; being written to `stderr-buffer' otherwise it's difficult
-              ;; to know if there was an error or not since an exit value
-              ;; of 2 may be used for invalid arguments as well as to check
-              ;; if the buffer was re-formatted.
-              (unless (zerop (buffer-size stderr-buffer))
-                (with-current-buffer stderr-buffer
-                  (setq stderr-as-string (buffer-string))
-                  (erase-buffer)))))))
+      ;; Unfortunately a separate process is set for the STDERR which uses it's own sentinel.
+      ;; Needed to override the "Process .. finished" message.
+      (unless (eq proc-out proc-err)
+        (setq sentinel-called-expect 2)
+        (set-process-sentinel
+         proc-err (lambda (_proc _msg) (setq sentinel-called (1+ sentinel-called)))))
 
       (condition-case err
           (progn
-            (process-send-region proc (point-min) (point-max))
-            (process-send-eof proc))
+            (process-send-region proc-out (point-min) (point-max))
+            (process-send-eof proc-out))
         (file-error
          ;; Formatting exited with an error, closing the `stdin' during execution.
          ;; Even though the `stderr' will almost always be set,
          ;; store the error as it may show additional context.
          (setq pipe-err-as-string (error-message-string err))))
 
-      (while (not sentinel-called)
+      (while (not (eq sentinel-called sentinel-called-expect))
         (accept-process-output))
 
-      (let ((exit-code (process-exit-status proc)))
+      (let ((exit-code (process-exit-status proc-out)))
         (cond
          ((zerop exit-code)
           ;; No difference.
           nil)
-         ((or (not (eq exit-code 2)) stderr-as-string pipe-err-as-string)
+         ((or (not (eq exit-code 2)) (not (zerop (buffer-size stderr-buffer))) pipe-err-as-string)
           (when pipe-err-as-string
             (message "py-autopep8: pipe closed with error (%s)" pipe-err-as-string))
-          (when stderr-as-string
-            (message "py-autopep8: error output\n%s" stderr-as-string))
+          (unless (zerop (buffer-size stderr-buffer))
+            (message "py-autopep8: error output\n%s"
+                     (with-current-buffer stderr-buffer
+                       (buffer-string))))
           (message "py-autopep8: Command %S failed with exit code %d!" command-with-args exit-code)
           nil)
          (t
