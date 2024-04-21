@@ -69,6 +69,7 @@ Otherwise you can set this to a user defined function."
 
 (defun py-autopep8--locate-dominating-file-from-buffer (filename)
   "Return the path to the current buffers FILENAME file or nil."
+  (declare (important-return-value t))
   (let ((filepath buffer-file-name))
     (when filepath
       (let ((dir (locate-dominating-file (file-name-directory filepath) filename)))
@@ -77,6 +78,7 @@ Otherwise you can set this to a user defined function."
 
 (defun py-autopep8--region-contract-to-whole-lines (beg end)
   "Clamp BEG & END to whole lines."
+  (declare (important-return-value t))
   (let ((beg-bol (pos-bol beg))
         (end-eol (pos-eol end)))
 
@@ -113,6 +115,7 @@ Otherwise you can set this to a user defined function."
   "Replace buffer contents with BUF, fast-path when undo is disabled.
 
 Useful for fast operation, especially for automated conversion or tests."
+  (declare (important-return-value nil))
   (let ((is-beg (bobp))
         (is-end (eobp)))
     (cond
@@ -137,6 +140,7 @@ Useful for fast operation, especially for automated conversion or tests."
   "Format current buffer using temporary STDOUT-BUFFER and STDERR-BUFFER.
 When RANGE is non-nil it's used as the range to format.
 Return non-nil when a the buffer was modified."
+  (declare (important-return-value t))
   (when (not (executable-find py-autopep8-command))
     (user-error "py-autopep8: %s command not found" py-autopep8-command))
 
@@ -221,6 +225,7 @@ Return non-nil when a the buffer was modified."
   "Format the current buffer.
 When RANGE is non-nil it's used as the range to format.
 Return non-nil when a the buffer was modified."
+  (declare (important-return-value nil))
   (let ((stdout-buffer nil)
         (stderr-buffer nil)
         (this-buffer (current-buffer)))
@@ -233,6 +238,7 @@ Return non-nil when a the buffer was modified."
 
 (defun py-autopep8--buffer-format-for-save-hook ()
   "Callback for `before-save-hook'."
+  (declare (important-return-value nil))
   ;; Demote errors as this is user configurable, we can't be sure it wont error.
   (when (or (eq py-autopep8-on-save-p 'always) ; Keep explicit check until Emacs 26.3 is dropped.
             (with-demoted-errors "py-autopep8: Error %S"
@@ -246,10 +252,12 @@ Return non-nil when a the buffer was modified."
 
 (defun py-autopep8--enable ()
   "Enable the hooks associated with `py-autopep8-mode'."
+  (declare (important-return-value nil))
   (add-hook 'before-save-hook #'py-autopep8--buffer-format-for-save-hook nil t))
 
 (defun py-autopep8--disable ()
   "Disable the hooks associated with `py-autopep8-mode'."
+  (declare (important-return-value nil))
   (remove-hook 'before-save-hook #'py-autopep8--buffer-format-for-save-hook t))
 
 
@@ -258,6 +266,7 @@ Return non-nil when a the buffer was modified."
 
 (defun py-autopep8-check-pyproject-exists ()
   "Return t when a pyproject.toml file is found."
+  (declare (important-return-value nil))
   (let ((project-file (py-autopep8--locate-dominating-file-from-buffer "pyproject.toml")))
     (cond
      (project-file
@@ -267,6 +276,7 @@ Return non-nil when a the buffer was modified."
 
 (defun py-autopep8-check-pyproject-exists-with-autopep8 ()
   "Return t when a pyproject.toml file is found with a tool.autopep8 entry."
+  (declare (important-return-value t))
   (let ((project-file (py-autopep8--locate-dominating-file-from-buffer "pyproject.toml")))
     (when project-file
       (with-temp-buffer
@@ -288,6 +298,7 @@ Return non-nil when a the buffer was modified."
 (defun py-autopep8-buffer ()
   "Use the \"autopep8\" tool to reformat the current buffer.
 Return non-nil when a the buffer was modified."
+  (declare (important-return-value nil))
   (interactive)
   (py-autopep8--buffer-format nil))
 
@@ -295,6 +306,7 @@ Return non-nil when a the buffer was modified."
 (defun py-autopep8-region (beg end)
   "Use the \"autopep8\" tool to reformat whole lines in the region (BEG, END).
 Return non-nil when a the buffer was modified."
+  (declare (important-return-value nil))
   (interactive "r")
   (py-autopep8--buffer-format (cons beg end)))
 
