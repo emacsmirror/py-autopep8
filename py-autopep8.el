@@ -200,7 +200,7 @@ Return non-nil when a the buffer was modified."
          ;; store the error as it may show additional context.
          (setq pipe-err-as-string (error-message-string err))))
 
-      (while (not (eq sentinel-called sentinel-called-expect))
+      (while (/= sentinel-called sentinel-called-expect)
         (accept-process-output))
 
       (let ((exit-code (process-exit-status proc-out)))
