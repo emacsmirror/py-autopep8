@@ -299,7 +299,7 @@ Return non-nil when a the buffer was modified."
   "Use the \"autopep8\" tool to reformat the current buffer.
 Return non-nil when a the buffer was modified."
   (declare (important-return-value nil))
-  (interactive)
+  (interactive "*")
   (py-autopep8--buffer-format nil))
 
 ;;;###autoload
@@ -307,7 +307,7 @@ Return non-nil when a the buffer was modified."
   "Use the \"autopep8\" tool to reformat whole lines in the region (BEG, END).
 Return non-nil when a the buffer was modified."
   (declare (important-return-value nil))
-  (interactive "r")
+  (interactive "*r")
   (py-autopep8--buffer-format (cons beg end)))
 
 ;;;###autoload
