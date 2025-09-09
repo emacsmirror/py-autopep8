@@ -179,16 +179,14 @@ Return non-nil when a the buffer was modified."
             :coding (cons this-buffer-coding this-buffer-coding)
             :connection-type 'pipe
             :command command-with-args
-            :sentinel
-            (lambda (_proc _msg) (setq sentinel-called (1+ sentinel-called)))))
+            :sentinel (lambda (_proc _msg) (incf sentinel-called))))
           (proc-err (get-buffer-process stderr-buffer)))
 
       ;; Unfortunately a separate process is set for the STDERR which uses it's own sentinel.
       ;; Needed to override the "Process .. finished" message.
       (unless (eq proc-out proc-err)
         (setq sentinel-called-expect 2)
-        (set-process-sentinel
-         proc-err (lambda (_proc _msg) (setq sentinel-called (1+ sentinel-called)))))
+        (set-process-sentinel proc-err (lambda (_proc _msg) (incf sentinel-called))))
 
       (condition-case err
           (progn
