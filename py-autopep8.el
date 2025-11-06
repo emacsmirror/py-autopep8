@@ -158,7 +158,7 @@ Useful for fast operation, especially for automated conversion or tests."
 When RANGE is non-nil it's used as the range to format.
 Return non-nil when a the buffer was modified."
   (declare (important-return-value t))
-  (when (not (executable-find py-autopep8-command))
+  (unless (executable-find py-autopep8-command)
     (user-error "py-autopep8: %s command not found" py-autopep8-command))
 
   ;; Set the default coding for the temporary buffers.
