@@ -223,7 +223,9 @@ Return non-nil when a the buffer was modified."
          ((zerop exit-code)
           ;; No difference.
           nil)
-         ((or (not (eq exit-code 2)) (not (zerop (buffer-size stderr-buffer))) pipe-err-as-string)
+         ((or (null (eq exit-code 2))
+              (null (zerop (buffer-size stderr-buffer)))
+              pipe-err-as-string)
           (when pipe-err-as-string
             (message "py-autopep8: pipe closed with error (%s)" pipe-err-as-string))
           (unless (zerop (buffer-size stderr-buffer))
