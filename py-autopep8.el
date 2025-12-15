@@ -290,7 +290,7 @@ Return non-nil when a the buffer was modified."
 
 (defun py-autopep8-check-pyproject-exists ()
   "Return t when a pyproject.toml file is found."
-  (declare (important-return-value nil))
+  (declare (important-return-value t))
   (let ((project-file (py-autopep8--locate-dominating-file-from-buffer "pyproject.toml")))
     (cond
      (project-file
