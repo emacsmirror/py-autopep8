@@ -4,8 +4,8 @@
 ;; Copyright (C) 2022  Campbell Barton  <ideasman42@gmail.com>
 ;; Copyright (C) 2013-2015, Friedrich Paetzke <f.paetzke@gmail.com>
 
-;; Author: Friedrich Paetzk <f.paetzke@gmail.com>
-
+;; Author: Friedrich Paetzke <f.paetzke@gmail.com>
+;; Maintainer: Campbell Barton <ideasman42@gmail.com>
 ;; URL: https://codeberg.org/ideasman42/emacs-py-autopep8
 ;; Keywords: convenience
 ;; Version: 2016.1
@@ -16,7 +16,7 @@
 ;; Provides the `py-autopep8-buffer' command, which uses the external "autopep8"
 ;; tool to tidy up the current buffer according to Python's PEP8.
 
-;;; Usage
+;;; Usage:
 
 ;;
 ;; To automatically apply when saving a python file, use the
@@ -64,7 +64,8 @@
 (defcustom py-autopep8-options nil
   "Options used for autopep8.
 
-Note that `-' and '--exit-code' are used by default."
+Note that arguments `-' (to read form the STDIN)
+and '--exit-code' are added after any options in this list."
   :type '(repeat (string :tag "option")))
 
 (defcustom py-autopep8-on-save-p 'always
@@ -162,7 +163,7 @@ Useful for fast operation, especially for automated conversion or tests."
 (defun py-autopep8--buffer-format-impl (range stdout-buffer stderr-buffer)
   "Format current buffer using temporary STDOUT-BUFFER and STDERR-BUFFER.
 When RANGE is non-nil it's used as the range to format.
-Return non-nil when a the buffer was modified."
+Return non-nil when the buffer was modified."
   (declare (important-return-value t))
   (unless (executable-find py-autopep8-command)
     (user-error "py-autopep8: %s command not found" py-autopep8-command))
@@ -205,7 +206,7 @@ Return non-nil when a the buffer was modified."
             :sentinel (lambda (_proc _msg) (incf sentinel-called))))
           (proc-err (get-buffer-process stderr-buffer)))
 
-      ;; Unfortunately a separate process is set for the STDERR which uses it's own sentinel.
+      ;; Unfortunately a separate process is set for the STDERR which uses its own sentinel.
       ;; Needed to override the "Process .. finished" message.
       (unless (eq proc-out proc-err)
         (setq sentinel-called-expect 2)
