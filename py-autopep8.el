@@ -179,7 +179,13 @@ Return non-nil when the buffer was modified."
         ;; Set this for `make-process' as there are no files for autopep8
         ;; to use to detect where to read local configuration from,
         ;; it's important the current directory is used to look this up.
-        (default-directory (file-name-directory (buffer-file-name))))
+        (default-directory
+         (let ((file-name (buffer-file-name)))
+           (cond
+            (file-name
+             (file-name-directory file-name))
+            (t
+             default-directory)))))
 
     ;; Support for formatting a limited range.
     (when range
