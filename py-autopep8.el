@@ -96,8 +96,14 @@ Otherwise you can set this to a user defined function."
 (defun py-autopep8--region-contract-to-whole-lines (beg end)
   "Clamp BEG & END to whole lines."
   (declare (important-return-value t))
-  (let ((beg-bol (pos-bol beg))
-        (end-eol (pos-eol end)))
+  (let ((beg-bol
+         (save-excursion
+           (goto-char beg)
+           (pos-bol)))
+        (end-eol
+         (save-excursion
+           (goto-char end)
+           (pos-eol))))
 
     ;; If the leading/trailing parts of the beginning/end lines is white-space
     ;; then extend the selection to the bounds, otherwise contract the range
