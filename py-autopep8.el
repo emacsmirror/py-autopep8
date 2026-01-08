@@ -163,7 +163,7 @@ Useful for fast operation, especially for automated conversion or tests."
 (defun py-autopep8--buffer-format-impl (range stdout-buffer stderr-buffer)
   "Format current buffer using temporary STDOUT-BUFFER and STDERR-BUFFER.
 When RANGE is non-nil it's used as the range to format.
-Return non-nil when the buffer was modified."
+Return non-nil if the buffer was modified."
   (declare (important-return-value t))
   (unless (executable-find py-autopep8-command)
     (user-error "py-autopep8: %s command not found" py-autopep8-command))
@@ -254,7 +254,7 @@ Return non-nil when the buffer was modified."
 (defun py-autopep8--buffer-format (range)
   "Format the current buffer.
 When RANGE is non-nil it's used as the range to format.
-Return non-nil when a the buffer was modified."
+Return non-nil if the buffer was modified."
   (declare (important-return-value nil))
   (let ((stdout-buffer nil)
         (stderr-buffer nil)
@@ -269,7 +269,7 @@ Return non-nil when a the buffer was modified."
 (defun py-autopep8--buffer-format-for-save-hook ()
   "Callback for `before-save-hook'."
   (declare (important-return-value nil))
-  ;; Demote errors as this is user configurable, we can't be sure it wont error.
+  ;; Demote errors as this is user configurable, we can't be sure it won't error.
   (when (with-demoted-errors "py-autopep8: Error %S"
           (funcall py-autopep8-on-save-p))
     (py-autopep8--buffer-format nil))
@@ -322,7 +322,7 @@ Return non-nil when a the buffer was modified."
 ;;;###autoload
 (defun py-autopep8-buffer ()
   "Use the \"autopep8\" tool to reformat the current buffer.
-Return non-nil when a the buffer was modified."
+Return non-nil if the buffer was modified."
   (declare (important-return-value nil))
   (interactive "*")
   (py-autopep8--buffer-format nil))
@@ -330,7 +330,7 @@ Return non-nil when a the buffer was modified."
 ;;;###autoload
 (defun py-autopep8-region (beg end)
   "Use the \"autopep8\" tool to reformat whole lines in the region (BEG, END).
-Return non-nil when a the buffer was modified."
+Return non-nil if the buffer was modified."
   (declare (important-return-value nil))
   (interactive "*r")
   (py-autopep8--buffer-format (cons beg end)))

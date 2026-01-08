@@ -2,7 +2,7 @@
 py-autopep8
 ###########
 
-Provides commands, which use the external ``autopep8`` tool to tidy up the current buffer according to Python's PEP8.
+Provides commands which use the external ``autopep8`` tool to tidy up the current buffer according to Python's PEP8.
 
 
 Usage
@@ -62,10 +62,10 @@ To customize the behavior of ``autopep8`` you can set the command and options it
    - ``'always`` always reformat on save.
 
    - ``'py-autopep8-check-pyproject-exists``
-     only reformat when ``pyproject.toml`` exists in the current directory or any of it's parents.
+     only reformat when ``pyproject.toml`` exists in the current directory or any of its parents.
 
    - ``'py-autopep8-check-pyproject-exists-with-autopep8``
-     only reformat when ``pyproject.toml`` exists in the current directory or any of it's parents and
+     only reformat when ``pyproject.toml`` exists in the current directory or any of its parents and
      contains a ``[tool.autopep8]`` entry.
 
    Otherwise you can set this to a user defined function.
